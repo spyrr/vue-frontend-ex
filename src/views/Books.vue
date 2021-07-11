@@ -37,14 +37,14 @@ export default {
       this.books = await books.getAll()
     },
     viewDetails(obj) {
-      eventBus.$emit('sidebar:viewDetails', obj)
+      eventBus.$emit(eventBus.evtList.sidebar.viewDetails, obj)
     },
     addBook() {
-      eventBus.$emit('sidebar:newBook')
+      eventBus.$emit(eventBus.evtList.sidebar.newBook)
     },
   },
   async created() {
-    eventBus.$on('books:getBooks', async () => {
+    eventBus.$on(eventBus.evtList.books.getBooks, async () => {
       await this.getBooks()
     })
 

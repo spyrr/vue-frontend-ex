@@ -24,7 +24,10 @@
       </div>
 
       <div class="px-2 py-3">
-        <b-button block variant="danger" @click="updateBook">{{btnUpNewCaption}}</b-button>
+        <b-button block
+          variant="danger"
+          @click="updateBook"
+        >{{btnUpNewCaption}}</b-button>
       </div>
     </b-sidebar>
   </div>
@@ -76,7 +79,7 @@ export default {
             this.forms[0].vmodel, this.forms[1].vmodel
           )
           console.log('The result of adding : ', rv)
-          eventBus.$emit('books:getBooks')
+          eventBus.$emit(eventBus.evtList.books.getBooks)
           this.sidebarState = false
         },
         Update: async() => {
@@ -84,7 +87,7 @@ export default {
             this.id, this.forms[0].vmodel, this.forms[1].vmodel
           )
           console.log('The result of update : ', rv)
-          eventBus.$emit('books:getBooks')
+          eventBus.$emit(eventBus.evtList.books.getBooks)
         }
       })[this.btnUpNewCaption]()
     },
@@ -104,12 +107,8 @@ export default {
     },
   },
   async created() {
-    eventBus.$on('sidebar:viewDetails', (obj) => {
-      this.viewDetails(obj)
-    })
-    eventBus.$on('sidebar:newBook', () => {
-      this.newBook()
-    })
+    eventBus.$on(eventBus.evtList.sidebar.viewDetails, this.viewDetails)
+    eventBus.$on(eventBus.evtList.sidebar.newBook, this.newBook)
   },
 }
 </script>

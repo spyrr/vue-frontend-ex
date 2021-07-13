@@ -2,9 +2,9 @@
   <div>
     <b-sidebar id="sidebar-footer"
       :aria-label="ariaLabel"
-      :title="id"
+      :title="sidebar.id"
       :backdrop-variant="variant"
-      v-model="sidebarState"
+      v-model="sidebar.isOpen"
       right shadow 
     >
       <template #footer="{ hide }">
@@ -17,8 +17,11 @@
           :label="o.label"
           :label-for="o.inputId"
         >
-          <b-form-input :id="o.inputId" trim
-            v-model="o.vmodel"
+          <b-form-input v-if='o.label === "Title"' :id="o.inputId" trim
+            v-model="sidebar.title"
+          ></b-form-input>
+          <b-form-input v-if='o.label === "Author"' :id="o.inputId" trim
+            v-model="sidebar.author"
           ></b-form-input>
         </b-form-group>
       </div>
@@ -26,8 +29,8 @@
       <div class="px-2 py-3">
         <b-button block
           variant="danger"
-          @click="updateBook"
-        >{{btnUpNewCaption}}</b-button>
+          @click="btnUpdateBook"
+        >{{sidebar.caption}}</b-button>
       </div>
     </b-sidebar>
   </div>
@@ -41,8 +44,7 @@
 </style>
 
 <script>
-import eventBus from '../../controllers/eventBus'
-import books from '../../controllers/books'
+import { mapGetters, } from 'vuex'
 
 export default {
   name: "sidebar",
@@ -50,65 +52,44 @@ export default {
     return {
       variant: 'dark',
       ariaLabel: 'Book ID',
-      id: 'ex id',
-      sidebarState: false,
-      btnUpNewCaption: 'Add',
       forms: [
         {
           groupId: 'field-title',
           description: 'Let us know book title.',
           label: 'Title',
           inputId: 'input-title',
-          vmodel: 'title',
         },
         {
           groupId: 'field-author',
           description: 'Let us know the author.',
           label: 'Author',
           inputId: 'input-author',
-          vmodel: 'author',
         },
       ],
     }
   },
   methods: {
-    async updateBook() {
-      ({
-        Add: async() => {
-          const rv = await books.newBook(
-            this.forms[0].vmodel, this.forms[1].vmodel
-          )
-          console.log('The result of adding : ', rv)
-          eventBus.$emit(eventBus.evtList.books.getBooks)
-          this.sidebarState = false
-        },
-        Update: async() => {
-          const rv = await books.updateBook(
-            this.id, this.forms[0].vmodel, this.forms[1].vmodel
-          )
-          console.log('The result of update : ', rv)
-          eventBus.$emit(eventBus.evtList.books.getBooks)
-        }
-      })[this.btnUpNewCaption]()
-    },
-    async newBook() {
-      this.id = 'New book'
-      this.forms[0].vmodel = ''
-      this.forms[1].vmodel = ''
-      this.btnUpNewCaption = 'Add'
-      this.sidebarState = true
-    },
-    async viewDetails(obj) {
-      this.id = obj.id
-      this.forms[0].vmodel = obj.title
-      this.forms[1].vmodel = obj.author
-      this.btnUpNewCaption = 'Update'
-      this.sidebarState = true
+    btnUpdateBook() {
+      let sidebar = this.$store.getters.sidebar
+      let book = {id: sidebar.id, title: sidebar.title, author: sidebar.author}
+
+      if(sidebar.caption === 'Add') {
+        this.$store.dispatch('newBook', book)
+      } else if(sidebar.caption === 'Update') {
+        this.$store.dispatch('updateBook', book)
+      }
+      this.$store.dispatch('closeSidebar')
     },
   },
-  async created() {
-    eventBus.$on(eventBus.evtList.sidebar.viewDetails, this.viewDetails)
-    eventBus.$on(eventBus.evtList.sidebar.newBook, this.newBook)
+  computed: {
+    ...mapGetters({
+      isOpen: 'sidebarState',
+      sidebar: 'sidebar',
+    }),
+  },
+  created () {
+    this.forms[0].vmodel = ''
+    this.forms[1].vmodel = ''
   },
 }
 </script>

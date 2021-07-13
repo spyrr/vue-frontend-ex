@@ -4,9 +4,9 @@
       :items="books"
       :fields="fields"
       striped hover 
-      @row-clicked="viewDetails"
+      @row-clicked="btnViewDetails"
     ></b-table>
-    <b-button variant="primary" @click="addBook" block>New book</b-button>
+    <b-button variant="primary" @click="btnNewBook" block>New book</b-button>
   </div>
 </template>
 
@@ -18,8 +18,7 @@
 </style>
 
 <script>
-import books from '../controllers/books'
-import eventBus from '../controllers/eventBus'
+import { mapGetters } from 'vuex'
 
 export default {
   data() {
@@ -29,26 +28,25 @@ export default {
         {key: 'title', label: 'Title', sortable: true},
         {key: 'author', label: 'Author', sortable: true}
       ],
-      books: []
     }
   },
   methods: {
-    async getBooks() {
-      this.books = await books.getAll()
+    btnViewDetails(book) {
+      this.$store.dispatch('setSidebar', {...book, caption: 'Update'})
+      this.$store.dispatch('openSidebar')
     },
-    viewDetails(obj) {
-      eventBus.$emit(eventBus.evtList.sidebar.viewDetails, obj)
-    },
-    addBook() {
-      eventBus.$emit(eventBus.evtList.sidebar.newBook)
-    },
+    btnNewBook() {
+      this.$store.dispatch('setSidebar', {
+        id: 'New book', title: '', author: '', caption: 'Add'
+      })
+      this.$store.dispatch('openSidebar')
+    }
   },
-  async created() {
-    eventBus.$on(eventBus.evtList.books.getBooks, async () => {
-      await this.getBooks()
-    })
-
-    await this.getBooks()
+  computed: mapGetters({
+    books: 'allBooks'
+  }),
+  created () {
+    this.$store.dispatch('reset')
   },
 }
 </script>

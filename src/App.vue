@@ -18,7 +18,7 @@ export default {
     Header,
     Sidebar,
   },
-};
+}
 </script>
 
 <style>

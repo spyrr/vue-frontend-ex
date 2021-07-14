@@ -44,7 +44,7 @@
 </style>
 
 <script>
-import { mapGetters, } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
   name: "sidebar",
@@ -69,27 +69,26 @@ export default {
     }
   },
   methods: {
+    ...mapActions('book', [
+      'newBook', 'updateBook', 'reset', 'setSidebar', 'closeSidebar'
+    ]),
     btnUpdateBook() {
-      let sidebar = this.$store.getters.sidebar
+      let sidebar = this.sidebar
       let book = {id: sidebar.id, title: sidebar.title, author: sidebar.author}
 
       if(sidebar.caption === 'Add') {
-        this.$store.dispatch('newBook', book)
+        this.newBook(book)
       } else if(sidebar.caption === 'Update') {
-        this.$store.dispatch('updateBook', book)
+        this.updateBook(book)
       }
-      this.$store.dispatch('closeSidebar')
+      this.closeSidebar()
     },
   },
   computed: {
-    ...mapGetters({
+    ...mapGetters('book', {
       isOpen: 'sidebarState',
       sidebar: 'sidebar',
     }),
-  },
-  created () {
-    this.forms[0].vmodel = ''
-    this.forms[1].vmodel = ''
   },
 }
 </script>

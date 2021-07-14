@@ -18,7 +18,7 @@
 </style>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
   data() {
@@ -31,22 +31,23 @@ export default {
     }
   },
   methods: {
+    ...mapActions('book', [
+      'reset', 'setSidebar', 'openSidebar', 'closeSidebar'
+    ]),
     btnViewDetails(book) {
-      this.$store.dispatch('setSidebar', {...book, caption: 'Update'})
-      this.$store.dispatch('openSidebar')
+      this.setSidebar({...book, caption: 'Update'})
+      this.openSidebar()
     },
     btnNewBook() {
-      this.$store.dispatch('setSidebar', {
-        id: 'New book', title: '', author: '', caption: 'Add'
-      })
-      this.$store.dispatch('openSidebar')
+      this.setSidebar({id: 'New book', title: '', author: '', caption: 'Add'})
+      this.openSidebar()
     }
   },
-  computed: mapGetters({
+  computed: mapGetters('book', {
     books: 'allBooks'
   }),
   created () {
-    this.$store.dispatch('reset')
+    this.reset()
   },
 }
 </script>
